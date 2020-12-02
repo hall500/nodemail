@@ -24,6 +24,9 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
+app.set('views', __dirname + '/views'); // general config
+app.set('view engine', 'jade');
+
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
  
