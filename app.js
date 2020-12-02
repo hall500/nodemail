@@ -112,9 +112,9 @@ Without 2FA: make sure less secure applications is set in account -> security
 then use the account password
  */
 
-app.get('/send-mail', function (req, res) {
+app.post('/send-mail', function (req, res) {
   const name = req.body.name;
-  const key = config.randomkey();
+  const key = req.body.key || config.randomkey();
   const email = new EmailData({
     from: `Company Support <${req.body.from}>`,
     to: `${name} <${req.body.to}>`,
@@ -153,6 +153,25 @@ app.post('/create-user', function (req, res) {
   });
 
   res.send("Sending email...");
+});
+
+app.use(function(req, res, next){
+  res.status(404);
+
+  // respond with html page
+  if (req.accepts('html')) {
+    res.render('404', { url: req.url });
+    return;
+  }
+
+  // respond with json
+  if (req.accepts('json')) {
+    res.send({ error: 'Not found' });
+    return;
+  }
+
+  // default to plain-text. send()
+  res.type('txt').send('Not found');
 });
 
 const port = process.env.PORT || 3000;
