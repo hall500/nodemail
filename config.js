@@ -8,6 +8,11 @@ const generateKey = (length = 12) => {
   return result;
 };
 
+const isEmpty = (item) => {
+  const fields = [null, undefined, "", false];
+  return fields.includes(item) || item.length === 0;
+}
+
 module.exports = config = {
   service: 'gmail',
   auth: {
@@ -17,5 +22,6 @@ module.exports = config = {
   tls: {
     rejectUnauthorized: false
   },
-  randomkey: generateKey
+  randomkey: generateKey,
+  isEmpty: isEmpty
 };

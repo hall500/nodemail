@@ -52,36 +52,36 @@ const EmailModel = new Schema({
 
 const EmailData = mongoose.model('Email', EmailModel);
 
-cron.schedule('10 * * * *', () => {
-  EmailData.find({ sent: false }, function (err, docs) {
-    if(!err && docs.length > 0){
-      docs.forEach((doc) => {
-        const mailOptions = {
-          from: doc.from,
-          to: doc.to,
-          subject: doc.subject,
-          text: doc.text
-        };
+cron.schedule('* * * * *', () => {
+  const now = new Date().toLocaleDateString();
+  EmailData.findOne({ sent: false }, function (err, doc) {
+    if(!err && !config.isEmpty(doc)){
+      const mailOptions = {
+        from: doc.from,
+        to: doc.to,
+        subject: doc.subject,
+        text: doc.text
+      };
 
-        transporter.verify(function(error, success) {
-          if (error) {
-            console.log("Unable to send mail");
-          } else {
-            console.log("Server is ready to take our messages");
-            transporter.sendMail(mailOptions, function(error, info){
-              if (error) {
-                  console.log(error);
-              } else {
-                console.log("Email successfully sent: " + info.response)
-                EmailData.updateOne({_id: doc._id}, { sent: true }, function(err, info){
-                  if(!err) console.log("Email updated successfully for " + doc.to);
-                });
-              }
-            });
-          }
-        });
-        
+      transporter.verify(function(error, success) {
+        if (error) {
+          console.log("Unable to send mail");
+        } else {
+          console.log("Server is ready to take our messages");
+          transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+                console.log("Verified: Unable to send mail");
+            } else {
+              console.log("Email successfully sent: " + info.response)
+              EmailData.updateOne({_id: doc._id}, { sent: true }, function(err, info){
+                if(!err) console.log("Email updated successfully for " + doc.to);
+              });
+            }
+          });
+        }
       });
+    }else{
+      console.log("No mails to send at " + now);
     }
   });
 });
@@ -133,6 +133,10 @@ app.post('/send-mail', function (req, res) {
   res.send("Sending email...");
 })
 
+
+/* 
+* Params : name, to
+*/
 app.post('/create-user', function (req, res) {
   const name = req.body.name;
   const key = config.randomkey();
