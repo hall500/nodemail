@@ -65,11 +65,11 @@ cron.schedule('10 * * * *', () => {
             console.log("Unable to send mail");
           } else {
             console.log("Server is ready to take our messages");
-            transporter.sendMail(params, function(error, info){
+            transporter.sendMail(mailOptions, function(error, info){
               if (error) {
                   console.log(error);
               } else {
-                console.log("Email successfully sent to " + doc.to)
+                console.log("Email successfully sent: " + info.response)
                 EmailData.updateOne({_id: doc._id}, { sent: true }, function(err, info){
                   if(!err) console.log("Email updated successfully for " + doc.to);
                 });
@@ -154,7 +154,8 @@ app.post('/create-user', function (req, res) {
 
   res.send("Sending email...");
 });
- 
-app.listen(8080, () => {
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
   console.log('The server is now running on port 3000');
 })
