@@ -1,11 +1,13 @@
 
 'use strict';
+const environment = process.env.ENV;
+if(!environment || environment == "development"){
+  const connectEnv = require('dotenv').config();
 
-const connectEnv = require('dotenv').config();
-
-if (connectEnv.error) {
-  console.log("You need to add an env file");
-  process.exit();
+  if (connectEnv.error) {
+    console.log("You need to add an env file");
+    process.exit();
+  }
 }
 
 const mongoose = require('mongoose');
